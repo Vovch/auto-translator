@@ -3,10 +3,11 @@ import argparse
 import os
 from tqdm import tqdm
 import time
+import torch
 
 def transcribe_audio(audio_path, model_name="small", output_format="txt"):
     """
-    Transcribe audio file using Whisper
+    Transcribe audio file using Whisper with automatic device selection
     
     Args:
         audio_path (str): Path to audio file
@@ -16,14 +17,19 @@ def transcribe_audio(audio_path, model_name="small", output_format="txt"):
     if not os.path.exists(audio_path):
         raise FileNotFoundError(f"Audio file not found: {audio_path}")
     
-    print(f"Loading Whisper model '{model_name}'...")
+    # Check if CUDA (NVIDIA GPU) is available
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"Loading Whisper model '{model_name}' using {device.upper()} device...")
+    
     model = whisper.load_model(model_name)
+    if device == "cuda":
+        model = model.to(device)
     
     print("Transcribing audio... This may take a while.")
     result = model.transcribe(
         audio_path,
         verbose=True,
-        fp16=False  # Using CPU mode since we have AMD GPU
+        fp16=(device == "cuda")  # Use FP16 only when using GPU
     )
     
     # Create output filename
@@ -56,14 +62,14 @@ def main():
     parser.add_argument('input', help='Input audio file path')
     parser.add_argument(
         '--model', 
-        choices=['tiny', 'base', 'small', 'medium', 'large'],
+        choices=['tiny', 'base', 'small', 'medium', 'large', 'turbo'],
         default='small',
         help='Whisper model to use (default: small)'
     )
     parser.add_argument(
         '--format',
         choices=['txt', 'srt'],
-        default='txt',
+        default='srt',
         help='Output format (txt or srt with timestamps) (default: txt)'
     )
     
