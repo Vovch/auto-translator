@@ -1,7 +1,6 @@
 import whisper
 import argparse
 import os
-from tqdm import tqdm
 import time
 import torch
 
