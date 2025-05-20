@@ -94,49 +94,18 @@ Remember:
 
 ## Usage
 
-### Individual Components
 
-#### Extract Audio from Video
-The `extract_audio.py` script allows you to extract audio from video files:
-
-```bash
-python extract_audio.py --input path/to/video.mp4 --output path/to/output.mp3
-```
-
-Parameters:
-- `--input`: Path to input video file
-- `--output`: (Optional) Path to output audio file. If not specified, will create one based on the input filename
-
-#### Transcribe Audio to Subtitles
-The `transcribe_audio.py` script transcribes audio files to SRT subtitles using Whisper:
-
-```bash
-python transcribe_audio.py --input path/to/audio.mp3 --model small --format srt
-```
-
-Parameters:
-- `--input`: Path to input audio file
-- `--model`: (Optional) Whisper model size ('tiny', 'base', 'small', 'medium', 'large')
-- `--format`: (Optional) Output format ('srt' or 'txt')
-
-#### Process Complete Video
+### Process Complete Video
 The `process_video.py` script combines all steps (extract audio, transcribe, and translate):
 
 ```bash
-python process_video.py --input path/to/video.mp4 --target-lang ja
-```
-
-#### Translate Existing Subtitles
-To translate an existing SRT file:
-
-```bash
-python translate_subtitles.py --input path/to/subtitles.srt --output translated_subtitles.srt --target-lang es
+python process_video.py --input path/to/video.mp4 --target-lang ru --output path/to/output.mp3
 ```
 
 ### Parameters
 
 - `--input`: Path to input video file or SRT file
-- `--output`: (Optional) Path to output file
+- `--output`: Path to output audio file (output.mp3)
 - `--target-lang`: Target language code (e.g., 'es' for Spanish, 'ja' for Japanese)
 
 ## Environment Variables
