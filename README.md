@@ -41,12 +41,12 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Create a `.env` file in the project root and add your configuration:
+1. Create a `.env` file in the project root (you might rename .env.example) and add your configuration **(use your own Google API key for translations)**:
 ```env
 WHISPER_MODEL=small
-OUTPUT_FORMAT=txt
+OUTPUT_FORMAT=srt
 AUDIO_CODEC=libmp3lame
-GEMINI_API_KEY=your_google_api_key
+GEMINI_API_KEY=<your_google_api_key>
 GEMINI_MODEL=gemini-2.0-flash-exp
 
 # Translation processing parameters
