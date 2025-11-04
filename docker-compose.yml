@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  translator:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./:/workspace
+    working_dir: /app
+    command: python process_video.py --help

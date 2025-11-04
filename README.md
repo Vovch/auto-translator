@@ -1,5 +1,8 @@
 # Video Subtitle Translator
 
+[Read this in Russian](README.ru.md)
+[Русская версия](README.ru.md)
+
 A Python-based tool that processes video files by extracting audio, generating subtitles using Whisper, and translating them to your desired language using Google's Gemini AI.
 
 ## Features
@@ -41,7 +44,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-1. Create a `.env` file in the project root (you might rename .env.example) and add your configuration **(use your own Google API key for translations)**:
+4. Create a `.env` file in the project root (you might rename `.env.example`) and add your configuration **(use your own Google API key for translations)**:
 ```env
 WHISPER_MODEL=small
 OUTPUT_FORMAT=srt
@@ -118,6 +121,8 @@ python process_video.py --input path/to/video.mp4 --target-lang ru --output path
 - `CHUNK_SIZE`: Maximum size of text chunks for translation
 - `PARALLEL_REQUESTS`: Number of parallel translation requests
 - `MAX_REQUESTS_PER_MINUTE`: Rate limiting for API requests
+- `CHUNK_SEPARATOR`: Separator inserted between translated chunks (default: blank line)
+- `TRANSLATION_PROMPT`: Optional prompt template to customize Gemini translation behaviour
 
 ## Docker
 
@@ -145,6 +150,26 @@ docker run --rm \
 
 The default container command prints the `process_video.py` help text. Override it with
 the command you need (as shown above).
+
+### Docker Compose
+
+The included `docker-compose.yml` wraps the same image build and mounts your project folder
+to `/workspace` so you can reference input and output paths from the host machine.
+
+1. Copy `.env.example` to `.env` and update the values for your environment.
+2. Build the service: `docker compose build`.
+3. Run commands as needed, for example:
+
+   ```bash
+   docker compose run --rm translator \
+     python process_video.py \
+     --input /workspace/input/video.mp4 \
+     --output /workspace/output/output.mp3 \
+     --target-lang ru
+   ```
+
+The `translator` service executes the command you provide and cleans up the container when
+`--rm` is passed. Omit the custom command to print the help text defined in the image.
 
 ## License
 

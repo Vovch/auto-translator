@@ -7,20 +7,28 @@ import cv2
 import time
 import argparse
 
-genai.delete_file("all")
-
 load_dotenv()
 
-api_key = "AIzaSyDv6A6G1XCNBWq2-gAOELQ74ljxiujeFSw"
+API_KEY_ENV_VAR = "GEMINI_API_KEY"
+
+
+def get_api_key():
+    """Fetch the Gemini API key from environment variables."""
+    api_key = os.getenv(API_KEY_ENV_VAR)
+    if not api_key:
+        raise ValueError(f"Please set {API_KEY_ENV_VAR} in your environment or .env file")
+    return api_key
+
 
 class VideoTextExtractor:
     def __init__(self, model_name="gemini-1.5-pro"):
         # Configure the API key
-        genai.configure(api_key=api_key)
+        self.api_key = get_api_key()
+        genai.configure(api_key=self.api_key)
         
         # Print configuration for debugging
         print(f"Using model: {model_name}")
-        print(f"API key configured: {api_key}")
+        print("Gemini API key loaded from environment variables.")
         
         try:
             self.model = genai.GenerativeModel(model_name=model_name)
@@ -93,7 +101,7 @@ class VideoTextExtractor:
         Format the output as a list of entries with timestamps in HH:MM:SS format and the corresponding text.
         Only include entries where text actually appears."""
 
-        response = model.generate_content(
+        response = self.model.generate_content(
             [video_file, prompt],
             request_options={"timeout": 600}
         )
@@ -204,9 +212,8 @@ def main():
     
     args = parser.parse_args()
     
-    # Get API key from environment variable
-    if not api_key:
-        raise ValueError("Please set GEMINI_API_KEY in your environment or .env file")
+    # Ensure API key is available before processing
+    _ = get_api_key()
     
     # Set default output path if not provided
     if not args.output:
