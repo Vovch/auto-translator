@@ -119,6 +119,33 @@ python process_video.py --input path/to/video.mp4 --target-lang ru --output path
 - `PARALLEL_REQUESTS`: Number of parallel translation requests
 - `MAX_REQUESTS_PER_MINUTE`: Rate limiting for API requests
 
+## Docker
+
+You can build a Docker image that packages the application with all required system
+and Python dependencies (including FFmpeg).
+
+### Build the image
+
+```bash
+docker build -t auto-translator .
+```
+
+### Run the container
+
+Provide your configuration through an `.env` file and mount the directory that contains
+your media files and desired outputs:
+
+```bash
+docker run --rm \
+  --env-file .env \
+  -v "$(pwd)":/workspace \
+  auto-translator \
+  python process_video.py --input /workspace/path/to/video.mp4 --output /workspace/output.mp3 --target-lang ru
+```
+
+The default container command prints the `process_video.py` help text. Override it with
+the command you need (as shown above).
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
