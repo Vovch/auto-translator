@@ -4,6 +4,74 @@
 
 Python-приложение, которое извлекает аудио из видео, расшифровывает его с помощью Whisper и переводит полученные субтитры через Google Gemini.
 
+## Docker (рекомендуется)
+
+Запуск проекта в Docker уже включает FFmpeg и все зависимости Python, поэтому можно сразу обрабатывать ролики без локальной настройки окружения.
+
+### Подготовка конфигурации
+
+1. Скопируйте `.env.example` в `.env`.
+2. Обновите значения, прежде всего `GEMINI_API_KEY` (Можно взять бесплатно на aistudio.google.com).
+3. Создайте каталоги для исходных файлов и результатов:
+   ```bash
+   mkdir -p input output
+   ```
+   ```powershell
+   New-Item -ItemType Directory -Force -Path input, output
+   ```
+
+### Сборка образа
+
+```bash
+docker build -t auto-translator .
+```
+
+### Запуск контейнера
+
+Выполняйте команды из корня проекта, чтобы каталоги `./input` и `./output` стали доступны в контейнере как `/workspace/input` и `/workspace/output`.
+
+#### Linux/macOS (Bash)
+
+```bash
+docker run --rm \
+  --env-file .env \
+  -v "$(pwd)":/workspace \
+  auto-translator \
+  python process_video.py --input /workspace/input/video.mp4 --output /workspace/output/video.mp3 --target-lang ru
+```
+
+#### Windows PowerShell
+
+```powershell
+docker run --rm `
+  --env-file .env `
+  -v "${PWD}:/workspace" `
+  auto-translator `
+  python process_video.py --input /workspace/input/video.mp4 --output /workspace/output/video.mp3 --target-lang ru
+```
+
+По умолчанию контейнер выполняет `python process_video.py --help`; при необходимости укажите свою команду, как показано выше.
+
+### Docker Compose
+
+Файл `docker-compose.yml` собирает тот же образ и примонтирует ваш проект в `/workspace`.
+
+1. Скопируйте `.env.example` в `.env` и обновите значения под своё окружение.
+2. Соберите сервис:
+   ```bash
+   docker compose build
+   ```
+3. Запускайте команды при необходимости:
+   ```bash
+   docker compose run --rm translator \
+     python process_video.py \
+     --input /workspace/input/video.mp4 \
+     --output /workspace/output/video.mp3 \
+     --target-lang ru
+   ```
+
+Передайте свою команду в `docker compose run translator`, чтобы выполнить другие сценарии, или опустите её, чтобы увидеть помощь по умолчанию.
+
 ## Возможности
 
 - Извлечение аудио из видеофайлов
@@ -121,50 +189,6 @@ python process_video.py --input путь/к/видео.mp4 --target-lang ru --ou
 - `MAX_REQUESTS_PER_MINUTE` — лимит запросов в минуту
 - `CHUNK_SEPARATOR` — разделитель между блоками при сохранении результата
 - `TRANSLATION_PROMPT` — настраиваемая подсказка для Gemini
-
-## Docker
-
-Готовый Docker-образ включает все системные и Python-зависимости, включая FFmpeg.
-
-### Сборка образа
-
-```bash
-docker build -t auto-translator .
-```
-
-### Запуск контейнера
-
-Передайте настройки через `.env` и смонтируйте директорию с медиа файлами:
-
-```bash
-docker run --rm \
-  --env-file .env \
-  -v "$(pwd)":/workspace \
-  auto-translator \
-  python process_video.py --input /workspace/path/to/video.mp4 --output /workspace/output.mp3 --target-lang ru
-```
-
-Команда по умолчанию выводит справку `process_video.py`. Передайте собственную команду, как показано выше.
-
-### Docker Compose
-
-Файл `docker-compose.yml` собирает образ и монтирует проект в `/workspace`, чтобы вы могли использовать файлы хоста.
-
-1. Скопируйте `.env.example` в `.env` и укажите свои значения.
-2. Соберите сервис:
-   ```bash
-   docker compose build
-   ```
-3. Запускайте нужные команды:
-   ```bash
-   docker compose run --rm translator \
-     python process_video.py \
-     --input /workspace/input/video.mp4 \
-     --output /workspace/output/output.mp3 \
-     --target-lang ru
-   ```
-
-Опция `--rm` удаляет контейнер после завершения работы.
 
 ## Лицензия
 

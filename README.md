@@ -5,6 +5,74 @@
 
 A Python-based tool that processes video files by extracting audio, generating subtitles using Whisper, and translating them to your desired language using Google's Gemini AI.
 
+## Docker (Preferred)
+
+Running the project in Docker bundles FFmpeg and all Python dependencies so you can start translating videos without preparing a local environment.
+
+### Prepare configuration
+
+1. Copy `.env.example` to `.env`.
+2. Update the values, especially `GEMINI_API_KEY`.
+3. Create local folders for media files and results:
+   ```bash
+   mkdir -p input output
+   ```
+   ```powershell
+   New-Item -ItemType Directory -Force -Path input, output
+   ```
+
+### Build the image
+
+```bash
+docker build -t auto-translator .
+```
+
+### Run the container
+
+Run commands from the project root so the `./input` and `./output` folders are available inside the container as `/workspace/input` and `/workspace/output`.
+
+#### Linux/macOS (Bash)
+
+```bash
+docker run --rm \
+  --env-file .env \
+  -v "$(pwd)":/workspace \
+  auto-translator \
+  python process_video.py --input /workspace/input/video.mp4 --output /workspace/output/video.mp3 --target-lang ru
+```
+
+#### Windows PowerShell
+
+```powershell
+docker run --rm `
+  --env-file .env `
+  -v "${PWD}:/workspace" `
+  auto-translator `
+  python process_video.py --input /workspace/input/video.mp4 --output /workspace/output/video.mp3 --target-lang ru
+```
+
+The container defaults to `python process_video.py --help`; override it with the command you need, as shown above.
+
+### Docker Compose
+
+The included `docker-compose.yml` builds the same image and mounts your project folder to `/workspace`.
+
+1. Copy `.env.example` to `.env` and update the values for your environment.
+2. Build the service:
+   ```bash
+   docker compose build
+   ```
+3. Run commands as needed:
+   ```bash
+   docker compose run --rm translator \
+     python process_video.py \
+     --input /workspace/input/video.mp4 \
+     --output /workspace/output/video.mp3 \
+     --target-lang ru
+   ```
+
+Pass a different command to `docker compose run translator` to execute other scripts, or omit it to show the default help text.
+
 ## Features
 
 - Extract audio from video files
@@ -123,53 +191,6 @@ python process_video.py --input path/to/video.mp4 --target-lang ru --output path
 - `MAX_REQUESTS_PER_MINUTE`: Rate limiting for API requests
 - `CHUNK_SEPARATOR`: Separator inserted between translated chunks (default: blank line)
 - `TRANSLATION_PROMPT`: Optional prompt template to customize Gemini translation behaviour
-
-## Docker
-
-You can build a Docker image that packages the application with all required system
-and Python dependencies (including FFmpeg).
-
-### Build the image
-
-```bash
-docker build -t auto-translator .
-```
-
-### Run the container
-
-Provide your configuration through an `.env` file and mount the directory that contains
-your media files and desired outputs:
-
-```bash
-docker run --rm \
-  --env-file .env \
-  -v "$(pwd)":/workspace \
-  auto-translator \
-  python process_video.py --input /workspace/path/to/video.mp4 --output /workspace/output.mp3 --target-lang ru
-```
-
-The default container command prints the `process_video.py` help text. Override it with
-the command you need (as shown above).
-
-### Docker Compose
-
-The included `docker-compose.yml` wraps the same image build and mounts your project folder
-to `/workspace` so you can reference input and output paths from the host machine.
-
-1. Copy `.env.example` to `.env` and update the values for your environment.
-2. Build the service: `docker compose build`.
-3. Run commands as needed, for example:
-
-   ```bash
-   docker compose run --rm translator \
-     python process_video.py \
-     --input /workspace/input/video.mp4 \
-     --output /workspace/output/output.mp3 \
-     --target-lang ru
-   ```
-
-The `translator` service executes the command you provide and cleans up the container when
-`--rm` is passed. Omit the custom command to print the help text defined in the image.
 
 ## License
 
