@@ -29,7 +29,7 @@ docker build -t auto-translator .
 
 ### Run the container
 
-Run commands from the project root so the `./input` and `./output` folders are available inside the container as `/workspace/input` and `/workspace/output`.
+Run commands from the project root so the `./input` and `./output` folders are available inside the container as `/workspace/input` and `/workspace/output`. **Please make sure you specified the correct file names for `--input` and `--output` as parameters!**
 
 #### Linux/macOS (Bash)
 
